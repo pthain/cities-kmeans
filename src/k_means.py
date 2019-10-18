@@ -35,7 +35,6 @@ TOLERANCE = 0.001
 '''
 def addCentroidCol(dataset):
     centroid_col = np.full((len(dataset), 1), -1)
-    print(np.append(dataset, centroid_col, 1))
     return np.append(dataset, centroid_col, 1)
 
 '''
@@ -133,14 +132,11 @@ def updateClusters(dataset, clusters):
         numberOfTuples[c_id] += 1
 
     for c_id in range(0, k):
-        #if(numberOfTuples[c_id] == 0):
-
-            #todo handle a cluster w/ no tuples
-
-        clusters[c_id] = (
-            (xSum[c_id]/numberOfTuples[c_id]),
-            (ySum[c_id]/numberOfTuples[c_id])
-            )
+        if(numberOfTuples[c_id] != 0):
+            clusters[c_id] = (
+                (xSum[c_id]/numberOfTuples[c_id]),
+                (ySum[c_id]/numberOfTuples[c_id])
+                )
     return clusters
 
 #Choose K random points from the data to act as the intial centroids.
@@ -171,27 +167,33 @@ def k_means(dataset, k):
     dataset = addCentroidCol(dataset)
     clusters = initClusters(k)
     clusters = getRandomCentroids(dataset, clusters);
-    print('line 159: Initial clusters', clusters)
+    #print('line 159: Initial clusters', clusters)
 
     #todo perform learning several times, average results
     #Perform learning
-    prevSSE = 0
-    for i in range(0, MAX_ITERS):
-        dataset = classifyData(dataset, clusters)   #Update data assignment
-        currentSSE = calcSSE(dataset, clusters)
-        #Calculate Error
-        print(currentSSE, prevSSE, TOLERANCE)
-        if ((currentSSE >= (prevSSE - TOLERANCE)) and
-            (currentSSE <= (prevSSE + TOLERANCE))):
-            print("result:", i, clusters)
-            return (dataset, clusters)
-            break
-        prevSSE = currentSSE
-        clusters = updateClusters(dataset, clusters) #Update centroids
+    
+        prevSSE = 0
+        for i in range(0, MAX_ITERS):
+            dataset = classifyData(dataset, clusters)   #Update data assignment
+            currentSSE = calcSSE(dataset, clusters)
+            #Calculate Error
+            print(currentSSE, prevSSE, TOLERANCE)
+            if ((currentSSE >= (prevSSE - TOLERANCE)) and
+                (currentSSE <= (prevSSE + TOLERANCE))):
+                print("result:", i, clusters)
+                return (dataset, clusters)  #No significant change in error
+            prevSSE = currentSSE
+            clusters = updateClusters(dataset, clusters) #Update centroids
     print("result:", clusters)
-    return (dataset, clusters)
-    '''
-        Iterate learning
-        Stop when SSE does not change (or below threshold?)
-        Display the coordinates of the centroid
-    '''
+    return (dataset, clusters) #Max_iterations reached
+
+def print_clusters(clusters):
+
+    c_str = ""
+    for i in range(0, len(clusters)):
+        lat = clusters.get(i)[0]
+        long = clusters.get(i)[1]
+        cityNum = (i + 1)
+        c_str += ("\tCity #"+ str(cityNum) +" | (Latitude: " + str(lat) + ", Longitude: " + str(long) + " )\n")
+    print("\nK Centroids for this dataset:")
+    print (c_str)
