@@ -194,12 +194,18 @@ def k_means(dataset, k):
     print("result:", lowestSSE)
     return clusters #Max_iterations reached
 
+'''
+Description:
+    Display results to console.
+'''
 def print_clusters(clusters):
     c_str = ""
     for i in range(0, len(clusters)):
         lat = clusters.get(i)[0]
         long = clusters.get(i)[1]
         cityNum = (i + 1)
-        c_str += ("\tCity #"+ str(cityNum) +" | (Latitude: " + str(lat) + ", Longitude: " + str(long) + " )\n")
+        c_str += ("\tCity #"+ str(cityNum) +" | ( " + str(lat) + ", " + str(long) + " )\n")
+
     print("\nK Centroids for this dataset:")
+    print("\tCity #  | (Latitude, \tLongitude )")
     print (c_str)
