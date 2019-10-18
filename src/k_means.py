@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import random as rand
 
+MAX_ITERS = 500
 
 '''
     Focus of this implementation
@@ -128,14 +129,17 @@ def updateClusters(dataset, clusters):
         c_id = int(datapoint[2])
         xSum[c_id] += datapoint[0]
         ySum[c_id] += datapoint[1]
+        numberOfTuples[c_id] += 1
 
-    for c_id in range(1, k):
-        if(numberOfTuples[c_id] == 0):
-                #todo handle a cluster w/ no tuples
-            clusters[c_id] = (
-                (xSum[c_id]/numberOfTuples[c_id]),
-                (ySum[c_id]/numberOfTuples[c_id])
-                )
+    for c_id in range(0, k):
+        #if(numberOfTuples[c_id] == 0):
+
+            #todo handle a cluster w/ no tuples
+
+        clusters[c_id] = (
+            (xSum[c_id]/numberOfTuples[c_id]),
+            (ySum[c_id]/numberOfTuples[c_id])
+            )
     return clusters
 
 #Choose K random points from the data to act as the intial centroids.
@@ -154,14 +158,18 @@ def k_means(dataset, k):
     dataset = addCentroidCol(dataset)
     clusters = initClusters(k)
     clusters = getRandomCentroids(dataset, clusters);
-    print('line 159: ', clusters)
+    print('line 159: Initial clusters', clusters)
     #Perform learning
-    dataset = classifyData(dataset, clusters)
-    clusters = updateClusters(dataset, clusters)
-    print(dataset)
 
+    for i in range(0, MAX_ITERS):
+        dataset = classifyData(dataset, clusters)
+        clusters = updateClusters(dataset, clusters)
+        '''
+        if (i < 10):
+            print("Iteration ", i , ": ",clusters[0])
+        '''
+    print("result", clusters)
     '''
-    ## TODO:
         Iterate learning
         Stop when SSE does not change (or below threshold?)
         Display the coordinates of the centroid
