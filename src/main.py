@@ -17,7 +17,7 @@ import k_means as km
 def get_dataset(datasetPath):
     data_frame = pd.read_excel(datasetPath, sheet_name='Sheet1')
     data_frame = data_frame[['Latitude', 'Longitude']]
-    print(data_frame)
+    #print(data_frame)
     d_set = data_frame.as_matrix()
     return d_set
 
@@ -28,7 +28,10 @@ if (len(sys.argv) == 3):
     dataset = get_dataset(datasetPath)
     #km.kmeans(dataset, k)
     #print(km.distance((0,-5),(-20,10)))
-    print(km.getCentroid(dataset))
+    dataset = km.addCentroidCol(dataset)
+    clusters = km.initClusters(3)
+    print clusters
+    print(km.updateClusters(dataset, clusters))
 
 else:
     print("Required input:")
