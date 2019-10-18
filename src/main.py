@@ -24,14 +24,10 @@ def get_dataset(datasetPath):
 #Program start
 if (len(sys.argv) == 3):
     datasetPath = sys.argv[1]
-    k = sys.argv[2]
+    k = int(sys.argv[2])
     dataset = get_dataset(datasetPath)
-    #km.kmeans(dataset, k)
+    km.k_means(dataset, k)
     #print(km.distance((0,-5),(-20,10)))
-    dataset = km.addCentroidCol(dataset)
-    clusters = km.initClusters(3)
-    print clusters
-    print(km.updateClusters(dataset, clusters))
 
 else:
     print("Required input:")

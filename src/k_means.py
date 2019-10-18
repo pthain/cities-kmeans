@@ -4,6 +4,7 @@ import sys
 import math
 import pandas as pd
 import numpy as np
+import random as rand
 
 
 '''
@@ -77,6 +78,13 @@ def classifyDatapoint(datapoint, clusters):
 
     return c_id
 
+#Todo: def classifyData, write doc
+def classifyData(dataset, clusters):
+    #Todo Error Check size of dataset
+    for datapoint in dataset:
+        datapoint[2] = classifyDatapoint((datapoint[0], datapoint[1]), clusters)
+    return dataset
+
 '''
 Description:
     Calculate the Within-Cluster Sum Squared Error (WC SSE).
@@ -87,16 +95,15 @@ Description:
 Parameters:
     ndarray dataset
 Return:
-    int SSE
+    (ndarray, int SSE)
 '''
 def calcSSE(dataset, clusters):
     SSE = 0
     for datapoint in dataset:
-        c_id = classifyDatapoint(datapoint, clusters)
-        datapoint[2] = c_id #Associate this point w/ cluster @ c_id
+        c_id = datapoint[2]
         datapoint = (datapoint[0], datapoint[1])
         centroid = clusters[c_id]
-        sSE += (distance(datapoint, centroid) ** 2)
+        SSE += (distance(datapoint, centroid) ** 2)
     return SSE
 
 '''
@@ -118,17 +125,44 @@ def updateClusters(dataset, clusters):
         if (dataset.shape[1] < 2 or datapoint[2] == -1):
             print("Error in calcClusters: Datapoint not assigned a cluster.")
             return "Exit (-1)"
-        c_id = datapoint[2]
+        c_id = int(datapoint[2])
         xSum[c_id] += datapoint[0]
         ySum[c_id] += datapoint[1]
 
     for c_id in range(1, k):
-        clusters[c_id] = (
-            (xSum[c_id]/numberOfTuples[c_id]),
-            (ySum[c_id]/numberOfTuples[c_id])
-            )
+        if(numberOfTuples[c_id] == 0):
+                #todo handle a cluster w/ no tuples
+            clusters[c_id] = (
+                (xSum[c_id]/numberOfTuples[c_id]),
+                (ySum[c_id]/numberOfTuples[c_id])
+                )
     return clusters
 
+#Choose K random points from the data to act as the intial centroids.
+def getRandomCentroids(dataset, clusters):
+    for c_id in range(0, len(clusters)):
+        tmp_cluster = (
+                dataset[rand.randrange(len(dataset))][0],
+                dataset[rand.randrange(len(dataset))][1]
+            )
+        clusters[c_id] = tmp_cluster
+
+    return clusters
 
 def k_means(dataset, k):
-    
+    #Prepare data
+    dataset = addCentroidCol(dataset)
+    clusters = initClusters(k)
+    clusters = getRandomCentroids(dataset, clusters);
+    print('line 159: ', clusters)
+    #Perform learning
+    dataset = classifyData(dataset, clusters)
+    clusters = updateClusters(dataset, clusters)
+    print(dataset)
+
+    '''
+    ## TODO:
+        Iterate learning
+        Stop when SSE does not change (or below threshold?)
+        Display the coordinates of the centroid
+    '''
