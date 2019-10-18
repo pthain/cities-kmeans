@@ -7,6 +7,7 @@ import numpy as np
 import random as rand
 
 MAX_ITERS = 500
+TOLERANCE = 0.001
 
 '''
     Focus of this implementation
@@ -153,22 +154,42 @@ def getRandomCentroids(dataset, clusters):
 
     return clusters
 
+
+'''
+Description:
+    Implementation of the K-means algorithm to find the centroids of several
+    cities by geographical location.
+Parameters:
+    ndarray dataset (every tuple has an X and Y coordinates)
+    int k   - Number of clusters
+Return:
+    (dataset, clusters)
+'''
+
 def k_means(dataset, k):
     #Prepare data
     dataset = addCentroidCol(dataset)
     clusters = initClusters(k)
     clusters = getRandomCentroids(dataset, clusters);
     print('line 159: Initial clusters', clusters)
-    #Perform learning
 
+    #todo perform learning several times, average results
+    #Perform learning
+    prevSSE = 0
     for i in range(0, MAX_ITERS):
-        dataset = classifyData(dataset, clusters)
-        clusters = updateClusters(dataset, clusters)
-        '''
-        if (i < 10):
-            print("Iteration ", i , ": ",clusters[0])
-        '''
-    print("result", clusters)
+        dataset = classifyData(dataset, clusters)   #Update data assignment
+        currentSSE = calcSSE(dataset, clusters)
+        #Calculate Error
+        print(currentSSE, prevSSE, TOLERANCE)
+        if ((currentSSE >= (prevSSE - TOLERANCE)) and
+            (currentSSE <= (prevSSE + TOLERANCE))):
+            print("result:", i, clusters)
+            return (dataset, clusters)
+            break
+        prevSSE = currentSSE
+        clusters = updateClusters(dataset, clusters) #Update centroids
+    print("result:", clusters)
+    return (dataset, clusters)
     '''
         Iterate learning
         Stop when SSE does not change (or below threshold?)
