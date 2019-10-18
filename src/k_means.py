@@ -33,8 +33,8 @@ class k_means:
 '''
 Description: Calculate the euclidean distance from a to b
 Parameters:
-    int[] a = (int x0, int y0),
-    int[] b = (int x1, int y1)
+    a = (int x0, int y0),
+    b = (int x1, int y1)
 
 Return: int distance
 '''
@@ -46,5 +46,21 @@ def distance(a, b):
     return math.sqrt(((x1 - x0) ** 2) + ((y1 - y0) ** 2))
 
 '''
+Description:
+    Given a set of datapoints, determine their centroid by
+    calculating the mean of all the datapoints.
+    i.e. sum all Xs, sum all Ys, divide by num of datapoints
+Parameters:
+    ndarray dataset (every tuple has an X and Y coordinates)
 
+Return:
+    centroid = (int x, int y)
 '''
+def getCentroid(dataset):
+    xSum = 0.0
+    ySum = 0.0
+    numberOfTuples = dataset.shape[0]
+    for i, datapoint in enumerate(dataset):
+        xSum += dataset[i][0]
+        ySum += dataset[i][1]
+    return ((xSum/numberOfTuples), (ySum/numberOfTuples))

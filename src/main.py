@@ -27,7 +27,8 @@ if (len(sys.argv) == 3):
     k = sys.argv[2]
     dataset = get_dataset(datasetPath)
     #km.kmeans(dataset, k)
-    print(km.distance((0,-5),(-20,10)))
+    #print(km.distance((0,-5),(-20,10)))
+    print(km.getCentroid(dataset))
 
 else:
     print("Required input:")
