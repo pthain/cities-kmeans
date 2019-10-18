@@ -5,12 +5,13 @@ import math
 import pandas as pd
 import numpy as np
 import random as rand
+import copy
 
 TRIALS = 100
 MAX_ITERS = 100
 TOLERANCE = 0.001
 
-### DATA FUNCTIONS ###
+### DATA HELPER FUNCTIONS ###
 
 '''
     Append a column to dataset associating each tuple with a cluster.
@@ -150,6 +151,8 @@ def getRandomCentroids(dataset, clusters):
     return clusters
 
 
+### CALLED BY MAIN PROCESS ###
+
 '''
 Description:
     Implementation of the K-means algorithm to find the centroids of several
@@ -158,41 +161,38 @@ Parameters:
     ndarray dataset (every tuple has an X and Y coordinates)
     int k   - Number of clusters
 Return:
-    clusters
+    Centroids of clusters that best fit the data
 '''
 
 def k_means(dataset, k):
     #Prepare data
     dataset = addCentroidCol(dataset)
-    clusters = initClusters(k)
-    clusters = getRandomCentroids(dataset, clusters);
-    #print('line 159: Initial clusters', clusters)
 
-    #todo perform learning several times, average results
     #Perform learning
     lowestSSE = sys.maxint
-    bestFitClusters = clusters
+    bestFitClusters = initClusters(k)
     for t in range(0, TRIALS):
-        clusters = getRandomCentroids(dataset, clusters);
+        trialClusters = getRandomCentroids(dataset, initClusters(k));
         prevSSE = 0
         for i in range(0, MAX_ITERS):
-            dataset = classifyData(dataset, clusters)   #Update data assignment
-            currentSSE = calcSSE(dataset, clusters)
-            #Calculate Error
+            dataset = classifyData(dataset, trialClusters)   #Update data assignment
+            currentSSE = calcSSE(dataset, trialClusters)     #Calculate Error
             if ((currentSSE >= (prevSSE - TOLERANCE)) and
                 (currentSSE <= (prevSSE + TOLERANCE))):
-                #No significant change in error
-                break
+                break #No significant change in error
             prevSSE = currentSSE
-            clusters = updateClusters(dataset, clusters) #Update centroids
+            trialClusters = updateClusters(dataset, trialClusters) #Update centroids
 
         #Save the set of clusters with the lowest SSE
         if(prevSSE < lowestSSE):
             lowestSSE = prevSSE
-            bestFitClusters = clusters
+            for i, centroid in enumerate(trialClusters):
+                tmp_cluster = (trialClusters.get(i)[0], trialClusters.get(i)[1])
+                bestFitClusters[i] = tmp_cluster
 
-    print("result:", lowestSSE)
-    return clusters #Max_iterations reached
+        #print("Line 185: ", t, prevSSE, bestFitClusters.get(0))
+    #print("\nSSE:" + str(lowestSSE))
+    return bestFitClusters #Max_iterations reached
 
 '''
 Description:
@@ -206,6 +206,6 @@ def print_clusters(clusters):
         cityNum = (i + 1)
         c_str += ("\tCity #"+ str(cityNum) +" | ( " + str(lat) + ", " + str(long) + " )\n")
 
-    print("\nK Centroids for this dataset:")
+    print("K Centroids for this dataset:")
     print("\tCity #  | (Latitude, \tLongitude )")
     print (c_str)
