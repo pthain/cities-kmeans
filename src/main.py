@@ -26,8 +26,8 @@ if (len(sys.argv) == 3):
     datasetPath = sys.argv[1]
     k = int(sys.argv[2])
     dataset = get_dataset(datasetPath)
-    k_means_obj = km.k_means(dataset, k)
-    km.print_clusters(k_means_obj[1])
+    k_means_clusters = km.k_means(dataset, k)
+    km.print_clusters(k_means_clusters)
     #print(km.distance((0,-5),(-20,10)))
 
 else:

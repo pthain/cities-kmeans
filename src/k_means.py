@@ -6,28 +6,11 @@ import pandas as pd
 import numpy as np
 import random as rand
 
-MAX_ITERS = 500
+TRIALS = 100
+MAX_ITERS = 100
 TOLERANCE = 0.001
 
-'''
-    Focus of this implementation
-
-    #Initialize centroids; returns a matrix of K centroids
-    #Limit the number of Iterations
-    #For each iteration
-        For every datapoint
-            For every centroid
-                Distance(datapoint, centroid)
-            Classify datapoint to a cluster
-        Now, each cluster has a list of datapoints associated with it
-        Re-calculate the centroids
-        +The WC SSE does the following:
-        Within-cluster sum of squared errors
-            For every centroid
-                For every datapoint
-                    add the sq. distance(c, dp) to a sum
-
-'''
+### DATA FUNCTIONS ###
 
 '''
     Append a column to dataset associating each tuple with a cluster.
@@ -47,6 +30,8 @@ def initClusters(k):
     for c_id in range(0, k):
         clusters[c_id] = []
     return clusters
+
+### CORE K-MEANS ##
 
 '''
 Description:
@@ -80,8 +65,12 @@ def classifyDatapoint(datapoint, clusters):
     return c_id
 
 #Todo: def classifyData, write doc
+'''
+Description:
+    Wrapper function that returns an updated dataset where
+    each tuple is classified to a centroid.
+'''
 def classifyData(dataset, clusters):
-    #Todo Error Check size of dataset
     for datapoint in dataset:
         datapoint[2] = classifyDatapoint((datapoint[0], datapoint[1]), clusters)
     return dataset
@@ -109,8 +98,8 @@ def calcSSE(dataset, clusters):
 
 '''
 Description:
-    For every cluster K, average the respective x,y coords of all points associated
-    with it, and update its centroid.
+    For every cluster K, calculate the average x,y coords of all
+    points associated with it, and update its centroid.
 Parameters:
     ndarray dataset (every tuple has an X and Y coordinates)
     dict clusters = { (int x_1, int y_1), (x_2, y_2), ..., (x_k, y_k)}
@@ -139,12 +128,22 @@ def updateClusters(dataset, clusters):
                 )
     return clusters
 
-#Choose K random points from the data to act as the intial centroids.
+'''
+Description:
+    Generate a cluster centroid from a random datapoint in the dataset for
+    kth cluster.
+Parameters:
+    ndarray dataset (every tuple has an X and Y coordinates)
+    int k   - Number of clusters
+Return:
+    clusters
+'''
 def getRandomCentroids(dataset, clusters):
     for c_id in range(0, len(clusters)):
+        randomCoefficient = rand.randrange(len(dataset))
         tmp_cluster = (
-                dataset[rand.randrange(len(dataset))][0],
-                dataset[rand.randrange(len(dataset))][1]
+                dataset[randomCoefficient][0],
+                dataset[randomCoefficient][1]
             )
         clusters[c_id] = tmp_cluster
 
@@ -159,7 +158,7 @@ Parameters:
     ndarray dataset (every tuple has an X and Y coordinates)
     int k   - Number of clusters
 Return:
-    (dataset, clusters)
+    clusters
 '''
 
 def k_means(dataset, k):
@@ -171,7 +170,6 @@ def k_means(dataset, k):
 
     #todo perform learning several times, average results
     #Perform learning
-    TRIALS = 1000
     lowestSSE = sys.maxint
     bestFitClusters = clusters
     for t in range(0, TRIALS):
@@ -193,11 +191,10 @@ def k_means(dataset, k):
             lowestSSE = prevSSE
             bestFitClusters = clusters
 
-    print("result:", clusters, lowestSSE)
-    return (dataset, clusters) #Max_iterations reached
+    print("result:", lowestSSE)
+    return clusters #Max_iterations reached
 
 def print_clusters(clusters):
-
     c_str = ""
     for i in range(0, len(clusters)):
         lat = clusters.get(i)[0]
