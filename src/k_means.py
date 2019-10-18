@@ -171,20 +171,29 @@ def k_means(dataset, k):
 
     #todo perform learning several times, average results
     #Perform learning
-    
+    TRIALS = 1000
+    lowestSSE = sys.maxint
+    bestFitClusters = clusters
+    for t in range(0, TRIALS):
+        clusters = getRandomCentroids(dataset, clusters);
         prevSSE = 0
         for i in range(0, MAX_ITERS):
             dataset = classifyData(dataset, clusters)   #Update data assignment
             currentSSE = calcSSE(dataset, clusters)
             #Calculate Error
-            print(currentSSE, prevSSE, TOLERANCE)
             if ((currentSSE >= (prevSSE - TOLERANCE)) and
                 (currentSSE <= (prevSSE + TOLERANCE))):
-                print("result:", i, clusters)
-                return (dataset, clusters)  #No significant change in error
+                #No significant change in error
+                break
             prevSSE = currentSSE
             clusters = updateClusters(dataset, clusters) #Update centroids
-    print("result:", clusters)
+
+        #Save the set of clusters with the lowest SSE
+        if(prevSSE < lowestSSE):
+            lowestSSE = prevSSE
+            bestFitClusters = clusters
+
+    print("result:", clusters, lowestSSE)
     return (dataset, clusters) #Max_iterations reached
 
 def print_clusters(clusters):
